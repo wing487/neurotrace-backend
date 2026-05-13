@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Dict, Any
 
-
 app = FastAPI(title="NeuroTrace API")
 
 
@@ -29,4 +28,14 @@ def run_inference(payload: InferenceRequest):
 
 @app.get("/")
 def root():
-    return {"message": "NeuroTrace backend is running"}
+    return {
+        "status": "ok",
+        "service": "neurotrace-backend",
+        "message": "NeuroTrace backend is running"
+    }
+
+
+@app.head("/")
+def root_head():
+    # Render and load balancers use HEAD / for health checks
+    return {}
