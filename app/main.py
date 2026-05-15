@@ -1,19 +1,28 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, Any
 
 app = FastAPI(title="NeuroTrace API")
 
+# ---------------------------
+# CORS FIX — REQUIRED FOR DASHBOARD
+# ---------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # or ["http://127.0.0.1:5500"] if you want to restrict it
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class InferenceRequest(BaseModel):
     data: Dict[str, Any]
-
 
 class InferenceResponse(BaseModel):
     stress: float
     uncertainty: float
     attention_shift: float
-
 
 @app.post("/api/inference", response_model=InferenceResponse)
 def run_inference(payload: InferenceRequest):
@@ -25,7 +34,6 @@ def run_inference(payload: InferenceRequest):
     }
     return InferenceResponse(**result)
 
-
 @app.get("/")
 def root():
     return {
@@ -33,7 +41,6 @@ def root():
         "service": "neurotrace-backend",
         "message": "NeuroTrace backend is running"
     }
-
 
 @app.head("/")
 def root_head():
